@@ -1,19 +1,19 @@
 package com.gary;
 
-import jdk.jfr.DataAmount;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
+@Component
 public class FtpClient {
     private String server;
     private int port;
@@ -30,6 +30,9 @@ public class FtpClient {
     }
     public void open() throws IOException {
         ftp = new FTPClient();
+        FTPClientConfig conf = new FTPClientConfig();
+        conf.setServerTimeZoneId("UTC");
+        ftp.configure(conf);
 
         ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
 
@@ -64,5 +67,17 @@ public class FtpClient {
 
     public void putFileToPath(File file, String path) throws IOException {
         ftp.storeFile(path, new FileInputStream(file));
+    }
+
+    public List<FTPFile> getLatestFeedfiles(Long lastDownloadTimeStamp) throws IOException {
+        FTPFile[] files = ftp.listFiles("/data");
+        List<FTPFile> filesToBeDownloaded = new ArrayList<>();
+        for(FTPFile f : files) {
+            Long fileLastModifiedTimeStamp = f.getTimestamp().getTimeInMillis();
+            if(fileLastModifiedTimeStamp > lastDownloadTimeStamp) {
+                filesToBeDownloaded.add(f);
+            }
+        }
+        return filesToBeDownloaded;
     }
 }
