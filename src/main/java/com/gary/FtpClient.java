@@ -30,9 +30,10 @@ public class FtpClient {
     }
     public void open() throws IOException {
         ftp = new FTPClient();
-        FTPClientConfig conf = new FTPClientConfig();
-        conf.setServerTimeZoneId("UTC");
-        ftp.configure(conf);
+        //The default timezone would be the current locale.
+//        FTPClientConfig conf = new FTPClientConfig();
+//        conf.setServerTimeZoneId("UTC");
+//        ftp.configure(conf);
 
         ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
 
@@ -73,6 +74,9 @@ public class FtpClient {
         FTPFile[] files = ftp.listFiles("/data");
         List<FTPFile> filesToBeDownloaded = new ArrayList<>();
         for(FTPFile f : files) {
+            if(f.getName().equalsIgnoreCase(".") || f.getName().equalsIgnoreCase("..")) {
+                continue;
+            }
             Long fileLastModifiedTimeStamp = f.getTimestamp().getTimeInMillis();
             if(fileLastModifiedTimeStamp > lastDownloadTimeStamp) {
                 filesToBeDownloaded.add(f);

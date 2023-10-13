@@ -9,11 +9,11 @@ import java.util.logging.Logger;
 
 @Component
 public class FtpFolderMonitorScheduler {
-    @Autowired
-    private FtpClient ftpClient;
+    private SftpClient sftpClient = new SftpClient("user", "123456", "localhost");
+
 
     @Scheduled(fixedRate=5000)
     public void monitorFtpFolder() {
-       // ftpClient.
+      // sftpClient.
     }
 }

@@ -3,19 +3,16 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockftpserver.fake.FakeFtpServer;
-import org.mockftpserver.fake.UserAccount;
-import org.mockftpserver.fake.filesystem.DirectoryEntry;
-import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
-import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,6 +24,8 @@ public class FtpFolderMonitorPollingTesterOnFtpServer {
     private Long lastDownloadTimeStamp;
 
     private FileSystem fileSystem;
+
+    private final String DOWNLOAD_FOLDER="C:\\garymar2007\\ftp-folder-monitor\\download\\";
 
     /**
      * Setup the ftp server folder structure:
@@ -66,14 +65,8 @@ public class FtpFolderMonitorPollingTesterOnFtpServer {
     }
 
     private void cleanUpFolder() {
-        File file1 = new File("C:/garymar2007/ftp-folder-monitor/temp/feedfile1.txt");
-        if(file1.delete()){
-            System.out.println("File deleted successfully");
-        }
-        File file2 = new File("C:/garymar2007/ftp-folder-monitor/temp/feedfile2.txt");
-        if(file2.delete()){
-            System.out.println("File deleted successfully");
-        }
+        Arrays.stream(Objects.requireNonNull(new File(DOWNLOAD_FOLDER)
+                .listFiles())).forEach(File::delete);
     }
 
     /**
@@ -93,7 +86,7 @@ public class FtpFolderMonitorPollingTesterOnFtpServer {
                 System.out.println("There is no new feed file in FTP server folder");
             } else {
                 for(FTPFile f : filesToBeDownloaded) {
-                    ftpClient.downloadFile("/data/" + f.getName(), "temp/" + f.getName());
+                    ftpClient.downloadFile("/data/" + f.getName(), "download/" + f.getName());
                 }
             }
 
@@ -120,7 +113,7 @@ public class FtpFolderMonitorPollingTesterOnFtpServer {
                 System.out.println("Waiting...");
                 break;
         }
-        return 0L;
+        return Instant.now().getEpochSecond() * 1000;
     }
 
     private void uploadFileToFtpServer() throws IOException, URISyntaxException {
