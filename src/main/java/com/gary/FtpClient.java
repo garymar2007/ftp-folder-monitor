@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Component
+//@Component
 public class FtpClient {
     private String server;
     private int port;

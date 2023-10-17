@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Properties;
 
 @Data
-@Component
+//@Component
 public class SftpClient {
     private JSch jsch;
     private Session session= null;

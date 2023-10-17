@@ -55,9 +55,9 @@ public class SftpFileTransferLiveTest {
 
     @After
     public void teardown() throws SftpException {
-        sftpClient.cleanupFolder();
+    //    sftpClient.cleanupFolder();
         sftpClient.disconnect();
-        cleanUpFolder();
+    //    cleanUpFolder();
     }
 
     private void cleanUpFolder() {
